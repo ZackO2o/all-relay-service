@@ -103,6 +103,10 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
+      // 生产构建时自动剔除所有 console.* 语句
+      esbuild: {
+        drop: ['console', 'debugger']
+      },
       rollupOptions: {
         output: {
           manualChunks(id) {
