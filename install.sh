@@ -133,7 +133,7 @@ install_service() {
 
     if [ ! -d "$install_dir" ]; then
         print_info "下载 ALL Relay Service..."
-        git clone https://github.com/ZackO2o/all-relay-service.git "$install_dir"
+        git clone https://github.com/ZackO2o/all-relay-service.git --branch v0.1.0 --depth 1 "$install_dir"
         print_ok "下载完成"
     fi
 

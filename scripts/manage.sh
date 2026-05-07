@@ -422,7 +422,7 @@ install_service() {
         rm -rf "$APP_DIR"
     fi
     
-    if ! git clone https://github.com/ZackO2o/all-relay-service.git "$APP_DIR"; then
+    if ! git clone https://github.com/ZackO2o/all-relay-service.git --branch v0.1.0 --depth 1 "$APP_DIR"; then
         print_error "克隆项目失败"
         return 1
     fi

@@ -28,7 +28,7 @@ ALL Relay Service 是一款统一的多平台 AI API 中转服务，作为客户
 ### ⚡ 一键安装（推荐）
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ZackO2o/all-relay-service/main/install.sh -o install.sh && bash install.sh
+curl -fsSL https://raw.githubusercontent.com/ZackO2o/all-relay-service/v0.1.0/install.sh -o install.sh && bash install.sh
 ```
 
 安装过程中会自动：
@@ -51,7 +51,7 @@ ars logs       # 查看日志
 ### 🐳 Docker 部署
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ZackO2o/all-relay-service/main/docker-compose-setup.sh -o docker-compose-setup.sh && bash docker-compose-setup.sh
+curl -fsSL https://raw.githubusercontent.com/ZackO2o/all-relay-service/v0.1.0/docker-compose-setup.sh -o docker-compose-setup.sh && bash docker-compose-setup.sh
 ```
 
 或者手动：
