@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Release Notes
+        id: notes
+        run: |
+          # 从 tag 获取版本号
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+
+          # 生成 changelog（上一个 tag 到现在的 commit）
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            CHANGES=$(git log --oneline --no-decorate "$PREV_TAG..HEAD" 2>/dev/null || echo "")
+          else
+            CHANGES=$(git log --oneline --no-decorate 2>/dev/null | head -20)
+          fi
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.notes.outputs.version }}
+          body: |
+            ## ${{ steps.notes.outputs.version }}
+
+            ### 一键安装
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.notes.outputs.version }}/install.sh -o install.sh && bash install.sh
+            ```
+
+            ### Docker 部署
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.notes.outputs.version }}/docker-compose-setup.sh -o docker-compose-setup.sh && bash docker-compose-setup.sh
+            ```
+
+            ### 变更
+            ```
+            ${{ steps.notes.outputs.changes }}
+            ```
+          draft: false
+          prerelease: false
+          make_latest: "true"

@@ -12,12 +12,19 @@
 package main
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"log"
+	"math/big"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/ZackO2o/all-relay-service/cliproxy-tls/oauth"
 	"github.com/ZackO2o/all-relay-service/cliproxy-tls/profile"
@@ -33,6 +40,17 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "9200"
+	}
+
+	// Auto-generate self-signed cert if missing (production mode)
+	if isProduction() {
+		if _, err := os.Stat("server.crt"); os.IsNotExist(err) {
+			log.Printf("[init] generating self-signed TLS certificate...")
+			if err := genSelfSignedCert("server.crt", "server.key"); err != nil {
+				log.Fatalf("[init] failed to generate cert: %v", err)
+			}
+			log.Printf("[init] self-signed certificate generated")
+		}
 	}
 
 	// Initialize
@@ -232,4 +250,54 @@ func init() {
 // Helper to check if running in production
 func isProduction() bool {
 	return strings.EqualFold(os.Getenv("GO_ENV"), "production")
+}
+
+// genSelfSignedCert generates a self-signed TLS certificate and key.
+func genSelfSignedCert(certPath, keyPath string) error {
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		return fmt.Errorf("generate key: %w", err)
+	}
+
+	template := x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			CommonName:   "localhost",
+			Organization: []string{"ALL Relay Service"},
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(365 * 24 * time.Hour),
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+		DNSNames:              []string{"localhost"},
+	}
+
+	certDER, err := x509.CreateCertificate(rand.Reader, &template, &template, &key.PublicKey, key)
+	if err != nil {
+		return fmt.Errorf("create cert: %w", err)
+	}
+
+	certOut, err := os.Create(certPath)
+	if err != nil {
+		return fmt.Errorf("create cert file: %w", err)
+	}
+	defer certOut.Close()
+	if err := pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: certDER}); err != nil {
+		return fmt.Errorf("encode cert: %w", err)
+	}
+
+	keyOut, err := os.Create(keyPath)
+	if err != nil {
+		return fmt.Errorf("create key file: %w", err)
+	}
+	defer keyOut.Close()
+	if err := pem.Encode(keyOut, &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(key),
+	}); err != nil {
+		return fmt.Errorf("encode key: %w", err)
+	}
+
+	return nil
 }

@@ -24,6 +24,11 @@ data/
 # Redis data directory
 redis_data/
 
+# cliproxy-tls (Go uTLS proxy)
+cliproxy-tls/cliproxy-tls
+cliproxy-tls/server.crt
+cliproxy-tls/server.key
+
 # Logs directory
 logs/
 logs1/
