@@ -23,8 +23,6 @@ const {
   normalizeOptionalNonNegativeInteger,
   normalizeTempUnavailablePolicyInput
 } = require('../../utils/tempUnavailablePolicy')
-const encryptionService = require('../../utils/encryptionService')
-
 // Lazy-loaded cliproxy-tls OAuth service (loaded only when CLAUDE_TLS_PROXY is set)
 let _cliproxyOAuth = null
 function _getCliproxyOAuth() {

@@ -168,8 +168,28 @@ install_service() {
 
     # 安装依赖
     print_info "安装 npm 依赖..."
-    npm install --production
-    print_ok "依赖安装完成"
+    if [ -n "$NPM_REGISTRY" ]; then
+        npm install --production --registry "$NPM_REGISTRY"
+    else
+        npm install --production
+    fi
+    print_ok "服务端依赖安装完成"
+
+    # 构建前端管理后台 (Vite SPA)
+    print_info "构建管理后台..."
+    cd "$install_dir/web/admin-spa"
+    if [ -n "$NPM_REGISTRY" ]; then
+        npm install --registry "$NPM_REGISTRY" 2>/dev/null
+    else
+        npm install 2>/dev/null
+    fi
+    npx vite build 2>/dev/null || {
+        print_warn "Vite 构建失败，尝试安装依赖后重试..."
+        npm install
+        npx vite build
+    }
+    print_ok "管理后台构建完成"
+    cd "$install_dir"
 
     # 复制配置
     if [ ! -f config/config.js ]; then
