@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Claude Relay Service 管理脚本
+# ALL Relay Service 管理脚本
 # 用于安装、更新、卸载、启动、停止、重启服务
-# 可以使用 crs 快捷命令调用
+# 可以使用 ars 快捷命令调用
 
 # 颜色定义
 RED='\033[0;31m'
@@ -14,7 +14,7 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # 默认配置
-DEFAULT_INSTALL_DIR="$HOME/claude-relay-service"
+DEFAULT_INSTALL_DIR="$HOME/all-relay-service"
 DEFAULT_REDIS_HOST="localhost"
 DEFAULT_REDIS_PORT="6379"
 DEFAULT_REDIS_PASSWORD=""
@@ -378,7 +378,7 @@ persist_install_path() {
 
 # 安装服务
 install_service() {
-    print_info "开始安装 Claude Relay Service..."
+    print_info "开始安装 ALL Relay Service..."
     
     # 询问安装目录
     echo -n "安装目录 (默认: $DEFAULT_INSTALL_DIR): "
@@ -422,7 +422,7 @@ install_service() {
         rm -rf "$APP_DIR"
     fi
     
-    if ! git clone https://github.com/Wei-Shaw/claude-relay-service.git "$APP_DIR"; then
+    if ! git clone https://github.com/ZackO2o/all-relay-service.git "$APP_DIR"; then
         print_error "克隆项目失败"
         return 1
     fi
@@ -488,7 +488,7 @@ EOF
         
         # 使用 sparse-checkout 来只获取需要的文件
         git clone --depth 1 --branch web-dist --single-branch \
-            https://github.com/Wei-Shaw/claude-relay-service.git \
+            https://github.com/ZackO2o/all-relay-service.git \
             "$TEMP_CLONE_DIR" 2>/dev/null || {
             # 如果 HTTPS 失败，尝试使用当前仓库的 remote URL
             REPO_URL=$(git config --get remote.origin.url)
@@ -556,9 +556,9 @@ EOF
         echo -e "  公网 API: ${GREEN}http://$public_ip:$APP_PORT/api/v1${NC}"
     fi
     echo -e "\n${YELLOW}管理命令：${NC}"
-    echo "  查看状态: crs status"
-    echo "  停止服务: crs stop"
-    echo "  重启服务: crs restart"
+    echo "  查看状态: ars status"
+    echo "  停止服务: ars stop"
+    echo "  重启服务: ars restart"
 }
 
 
@@ -569,7 +569,7 @@ update_service() {
         return 1
     fi
     
-    print_info "更新 Claude Relay Service..."
+    print_info "更新 ALL Relay Service..."
     
     cd "$APP_DIR"
     
@@ -691,7 +691,7 @@ update_service() {
             print_info "尝试下载前端文件 (第 $attempt 次)..."
             
             if git clone --depth 1 --branch web-dist --single-branch \
-                https://github.com/Wei-Shaw/claude-relay-service.git \
+                https://github.com/ZackO2o/all-relay-service.git \
                 "$TEMP_CLONE_DIR" 2>/dev/null; then
                 clone_success=true
                 break
@@ -806,7 +806,7 @@ uninstall_service() {
         return 1
     fi
     
-    print_warning "即将卸载 Claude Relay Service"
+    print_warning "即将卸载 ALL Relay Service"
     echo -n "确定要卸载吗？(y/N): "
     read -n 1 confirm
     echo
@@ -824,7 +824,7 @@ uninstall_service() {
     echo
     
     if [[ "$backup" =~ ^[Yy]$ ]]; then
-        local backup_dir="$HOME/claude-relay-backup-$(date +%Y%m%d%H%M%S)"
+        local backup_dir="$HOME/all-relay-backup-$(date +%Y%m%d%H%M%S)"
         mkdir -p "$backup_dir"
         
         # Redis使用系统默认位置，不需要备份
@@ -870,11 +870,11 @@ start_service() {
     if command_exists pm2 && [ "$1" != "--no-pm2" ]; then
         print_info "使用 pm2 启动服务..."
         # 直接使用pm2启动，避免循环调用
-        pm2 start "$APP_DIR/src/app.js" --name "claude-relay" --log "$APP_DIR/logs/pm2.log" 2>/dev/null
+        pm2 start "$APP_DIR/src/app.js" --name "all-relay" --log "$APP_DIR/logs/pm2.log" 2>/dev/null
         sleep 2
         
         # 检查是否启动成功
-        if pm2 list 2>/dev/null | grep -q "claude-relay"; then
+        if pm2 list 2>/dev/null | grep -q "all-relay"; then
             print_success "服务已通过 pm2 启动"
             pm2 save 2>/dev/null || true
         else
@@ -937,8 +937,8 @@ stop_service() {
     # 尝试使用pm2停止
     if command_exists pm2 && [ -n "$APP_DIR" ] && [ -d "$APP_DIR" ]; then
         cd "$APP_DIR" 2>/dev/null
-        pm2 stop claude-relay 2>/dev/null || true
-        pm2 delete claude-relay 2>/dev/null || true
+        pm2 stop all-relay 2>/dev/null || true
+        pm2 delete all-relay 2>/dev/null || true
     fi
     
     # 使用PID文件停止
@@ -1228,7 +1228,7 @@ switch_branch() {
             
             # 下载前端文件
             if git clone --depth 1 --branch "$web_branch" --single-branch \
-                https://github.com/Wei-Shaw/claude-relay-service.git \
+                https://github.com/ZackO2o/all-relay-service.git \
                 "$TEMP_CLONE_DIR" 2>/dev/null; then
                 
                 # 复制文件到目标目录
@@ -1284,12 +1284,12 @@ switch_branch() {
     fi
     
     echo ""
-    print_info "提示：如遇到问题，可以运行 'crs update' 强制更新到最新版本"
+    print_info "提示：如遇到问题，可以运行 'ars update' 强制更新到最新版本"
 }
 
 # 显示状态
 show_status() {
-    echo -e "\n${BLUE}=== Claude Relay Service 状态 ===${NC}"
+    echo -e "\n${BLUE}=== ALL Relay Service 状态 ===${NC}"
     
     # 获取实际端口
     local actual_port="$APP_PORT"
@@ -1361,7 +1361,7 @@ show_status() {
 
 # 显示帮助
 show_help() {
-    echo "Claude Relay Service 管理脚本"
+    echo "ALL Relay Service 安装管理脚本"
     echo ""
     echo "用法: $0 [命令]"
     echo ""
@@ -1375,7 +1375,7 @@ show_help() {
     echo "  status         - 查看状态"
     echo "  switch-branch  - 切换分支"
     echo "  update-pricing - 更新模型价格数据"
-    echo "  symlink        - 创建 crs 快捷命令"
+    echo "  symlink        - 创建 ars 快捷命令"
     echo "  help           - 显示帮助"
     echo ""
 }
@@ -1384,7 +1384,7 @@ show_help() {
 show_menu() {
     clear
     echo -e "${BOLD}======================================${NC}"
-    echo -e "${BOLD}  Claude Relay Service (CRS) 管理工具  ${NC}"
+    echo -e "${BOLD}  ALL Relay Service 管理工具  ${NC}"
     echo -e "${BOLD}======================================${NC}"
     echo ""
     
@@ -1628,8 +1628,8 @@ create_symlink() {
     
     # 创建软链接
     if sudo ln -s "$script_path" "$symlink_path"; then
-        print_success "已创建快捷命令 'crs'"
-        echo "您现在可以在任何地方使用 'crs' 命令管理服务"
+        print_success "已创建快捷命令 'ars'"
+        echo "您现在可以在任何地方使用 'ars' 命令管理服务"
         
         # 验证软链接
         if [ -L "$symlink_path" ]; then

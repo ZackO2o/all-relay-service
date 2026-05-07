@@ -39,7 +39,7 @@ async function setup() {
 
     // 3. 生成或使用环境变量中的管理员凭据
     const adminUsername =
-      process.env.ADMIN_USERNAME || `cr_admin_${crypto.randomBytes(4).toString('hex')}`
+      process.env.ADMIN_USERNAME || `ar_admin_${crypto.randomBytes(4).toString('hex')}`
     const adminPassword =
       process.env.ADMIN_PASSWORD ||
       crypto

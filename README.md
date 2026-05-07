@@ -25,33 +25,51 @@ ALL Relay Service 是一款统一的多平台 AI API 中转服务，作为客户
 
 ## 快速开始
 
-### 前置要求
-
-- Node.js >= 18.x
-- Redis >= 6.x
-- npm / yarn
-
-### 安装
+### ⚡ 一键安装（推荐）
 
 ```bash
-# 克隆项目
-git clone https://github.com/ZackO2o/all-relay-service.git
-cd all-relay-service
-
-# 安装依赖
-npm install
-
-# 初始化
-npm run setup
-
-# 启动开发模式
-npm run dev
+curl -fsSL https://raw.githubusercontent.com/ZackO2o/all-relay-service/main/install.sh -o install.sh && bash install.sh
 ```
 
-### Docker 部署
+安装过程中会自动：
+- ✅ 检测系统环境并安装 Node.js 18+、Redis
+- ✅ 交互式配置端口、Redis 连接等
+- ✅ 自动启动服务并显示管理地址
+- ✅ 注册 `ars` 快捷管理命令
+
+安装完成后使用 `ars` 命令管理服务：
+
+```bash
+ars start      # 启动服务
+ars stop       # 停止服务
+ars restart    # 重启服务
+ars status     # 查看状态
+ars update     # 更新服务
+ars logs       # 查看日志
+```
+
+### 🐳 Docker 部署
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ZackO2o/all-relay-service/main/docker-compose-setup.sh -o docker-compose-setup.sh && bash docker-compose-setup.sh
+```
+
+或者手动：
 
 ```bash
 docker compose up -d
+```
+
+### 📦 手动部署
+
+```bash
+# 前置要求：Node.js >= 18.x, Redis >= 6.x
+
+git clone https://github.com/ZackO2o/all-relay-service.git
+cd all-relay-service
+npm install
+npm run setup
+npm run dev
 ```
 
 访问管理后台：`http://localhost:3000/admin-next/login`

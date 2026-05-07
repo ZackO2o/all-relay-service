@@ -35,7 +35,7 @@ FROM node:18-alpine
 
 # 📋 设置标签
 LABEL maintainer="all-relay-service@example.com"
-LABEL description="Claude Code API Relay Service"
+LABEL description="ALL Relay Service"
 LABEL version="1.0.0"
 
 # 🔧 安装系统依赖

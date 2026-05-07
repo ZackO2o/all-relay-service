@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-echo "🚀 Claude Relay Service 启动中..."
+echo "🚀 ALL Relay Service 启动中..."
 
 # 检查关键环境变量
 if [ -z "$JWT_SECRET" ]; then
@@ -61,5 +61,5 @@ else
 fi
 
 # 启动应用
-echo "🌐 启动 Claude Relay Service..."
+echo "🌐 启动 ALL Relay Service..."
 exec "$@"
