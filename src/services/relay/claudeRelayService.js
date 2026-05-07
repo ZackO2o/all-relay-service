@@ -30,7 +30,15 @@ const safeClone =
 
 class ClaudeRelayService {
   constructor() {
-    this.claudeApiUrl = 'https://api.anthropic.com/v1/messages?beta=true'
+    // Use TLS proxy (Go uTLS service) if configured
+    const tlsProxy = process.env.CLAUDE_TLS_PROXY || ''
+    if (tlsProxy) {
+      this.claudeApiUrl = `${tlsProxy.replace(/\/+$/, '')}/v1/messages`
+      this._usingTlsProxy = true
+    } else {
+      this.claudeApiUrl = 'https://api.anthropic.com/v1/messages?beta=true'
+      this._usingTlsProxy = false
+    }
     // 🧹 内存优化：用于存储请求体字符串，避免闭包捕获
     this.bodyStore = new Map()
     this._bodyStoreIdCounter = 0
