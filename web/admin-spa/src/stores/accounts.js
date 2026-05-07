@@ -253,6 +253,15 @@ export const useAccountsStore = defineStore('accounts', () => {
 
   const exchangeDroidCode = (data) => httpApis.exchangeDroidCodeApi(data)
 
+  const checkCliproxyStatus = async () => {
+    try {
+      const res = await httpApis.getCliproxyStatusApi()
+      return res.success ? res.data.configured : false
+    } catch {
+      return false
+    }
+  }
+
   const sortAccounts = (field) => {
     if (sortBy.value === field) {
       sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
@@ -332,6 +341,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     exchangeOpenAICode,
     generateDroidAuthUrl,
     exchangeDroidCode,
+    checkCliproxyStatus,
     sortAccounts,
     reset
   }

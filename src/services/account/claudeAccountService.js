@@ -347,7 +347,7 @@ class ClaudeAccountService {
           data: {
             access_token: tokenData.access_token,
             refresh_token: tokenData.refresh_token,
-            expires_in: Math.round((new Date(tokenData.expire).getTime() - Date.now()) / 1000)
+            expires_in: Math.max(60, Math.round((new Date(tokenData.expire).getTime() - Date.now()) / 1000))
           }
         }
       } else {

@@ -136,7 +136,7 @@ router.post('/claude-accounts/exchange-code', authenticateAdmin, async (req, res
       tokenData = {
         access_token: tokenData.access_token,
         refresh_token: tokenData.refresh_token,
-        expires_in: Math.round((new Date(tokenData.expire).getTime() - Date.now()) / 1000),
+        expires_in: Math.max(60, Math.round((new Date(tokenData.expire).getTime() - Date.now()) / 1000)),
         scope: 'user:profile user:inference user:sessions:claude_code user:mcp_servers user:file_upload'
       }
     } else {
@@ -1213,6 +1213,16 @@ router.post('/claude-accounts/batch-test-history', authenticateAdmin, async (req
       error: 'Failed to get batch test history',
       message: error.message
     })
+  }
+})
+
+// 检查cliproxy-tls配置状态
+router.get('/claude-accounts/cliproxy-status', authenticateAdmin, async (req, res) => {
+  try {
+    const baseUrl = cliproxyOAuth.getBaseUrl()
+    return res.json({ success: true, data: { configured: !!baseUrl } })
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message })
   }
 })
 

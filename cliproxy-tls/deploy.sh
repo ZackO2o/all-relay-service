@@ -68,7 +68,7 @@ install_systemd() {
 
     cat > "$service_file" << EOF
 [Unit]
-Description=CLIProxy TLS - uTLS-powered Claude API proxy
+Description=CLIProxy TLS - uTLS-powered multi-backend relay proxy
 After=network.target
 
 [Service]
@@ -80,6 +80,8 @@ Restart=always
 RestartSec=5
 Environment=PORT=9200
 Environment=GO_ENV=production
+# 多后端路由配置 (JSON) — 不设置则只走 Anthropic（原有行为）
+# Environment=BACKENDS_CONFIG='[{"name":"anthropic","base_url":"https://api.anthropic.com","type":"anthropic","model_pattern":"claude-","response_model_name":""},{"name":"deepseek","base_url":"https://api.deepseek.com/anthropic","type":"generic","model_pattern":"deepseek-","sanitize":{"remove_output_config":true,"remove_thinking":true},"response_model_name":"claude-sonnet-4-6","timeout":120}]'
 
 [Install]
 WantedBy=multi-user.target

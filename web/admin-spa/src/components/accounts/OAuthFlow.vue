@@ -14,6 +14,15 @@
           <div class="flex-1">
             <h4 class="mb-3 font-semibold text-blue-900 dark:text-blue-200">Claude 账户授权</h4>
 
+            <!-- uTLS 安全传输代理徽章 -->
+            <div v-if="cliproxyConfigured" class="mb-3">
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/40 dark:text-green-300"
+              >
+                <i class="fas fa-lock" /> 🔒 已启用 uTLS 安全传输代理
+              </span>
+            </div>
+
             <!-- 授权方式选择 -->
             <div class="mb-4">
               <label class="mb-2 block text-sm font-medium text-blue-800 dark:text-blue-300">
@@ -31,7 +40,7 @@
                   />
                   <span class="text-sm text-blue-900 dark:text-blue-200">手动授权</span>
                 </label>
-                <label class="flex cursor-pointer items-center gap-2">
+                <label v-if="!cliproxyConfigured" class="flex cursor-pointer items-center gap-2">
                   <input
                     v-model="authMethod"
                     class="text-blue-600 focus:ring-blue-500"
@@ -803,7 +812,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { showToast } from '@/utils/tools'
 import { useAccountsStore } from '@/stores/accounts'
 
@@ -821,6 +830,21 @@ const props = defineProps({
 const emit = defineEmits(['success', 'back'])
 
 const accountsStore = useAccountsStore()
+
+// cliproxy-tls 状态感知
+const cliproxyConfigured = ref(false)
+
+onMounted(async () => {
+  try {
+    cliproxyConfigured.value = await accountsStore.checkCliproxyStatus()
+    // 如果cliproxy已配置，强制使用手动授权模式
+    if (cliproxyConfigured.value) {
+      authMethod.value = 'manual'
+    }
+  } catch {
+    cliproxyConfigured.value = false
+  }
+})
 
 // 状态
 const loading = ref(false)

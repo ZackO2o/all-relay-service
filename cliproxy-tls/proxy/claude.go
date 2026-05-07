@@ -42,6 +42,27 @@ func New(devProfile *profile.DeviceProfile) *ClaudeProxy {
 // ClaudeBaseURL is the Anthropic API endpoint.
 const ClaudeBaseURL = "https://api.anthropic.com"
 
+// ---------------------------------------------------------------------------
+// Exported methods for use by main.go's handleRelay
+// ---------------------------------------------------------------------------
+
+// SignBody applies CCH signing to the request body.
+// It is exported so the router-based handler can use it for Anthropic backends.
+func (p *ClaudeProxy) SignBody(body []byte) []byte {
+	return signing.SignBody(body)
+}
+
+// Do executes an HTTP request through the uTLS transport and returns the response.
+// It is exported so the router-based handler can reuse the same uTLS client pool.
+func (p *ClaudeProxy) Do(req *http.Request) (*http.Response, error) {
+	return p.client.Do(req)
+}
+
+// Profile returns the device profile used by this proxy.
+func (p *ClaudeProxy) Profile() *profile.DeviceProfile {
+	return p.profile
+}
+
 // HandleMessages proxies POST /v1/messages to Anthropic.
 // Supports both streaming (SSE) and non-streaming responses.
 func (p *ClaudeProxy) HandleMessages(w http.ResponseWriter, r *http.Request) {
@@ -127,6 +148,11 @@ func (p *ClaudeProxy) HandleMessages(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			buf := make([]byte, 32*1024)
 			for {
+				select {
+				case <-r.Context().Done():
+					return
+				default:
+				}
 				n, err := resp.Body.Read(buf)
 				if n > 0 {
 					w.Write(buf[:n])
