@@ -7,7 +7,7 @@ const redis = require('../models/redis')
 const logger = require('../utils/logger')
 const metadataUserIdHelper = require('../utils/metadataUserIdHelper')
 
-const CONFIG_KEY = 'claude_relay_config'
+const CONFIG_KEY = 'all_relay_config'
 const SESSION_BINDING_PREFIX = 'original_session_binding:'
 
 // 默认配置

@@ -12,10 +12,10 @@ const logger = require('../../utils/logger')
 const router = express.Router()
 
 /**
- * GET /admin/claude-relay-config
+ * GET /admin/all-relay-config
  * 获取 Claude 转发配置
  */
-router.get('/claude-relay-config', authenticateAdmin, async (req, res) => {
+router.get('/all-relay-config', authenticateAdmin, async (req, res) => {
   try {
     const config = await claudeRelayConfigService.getConfig()
     return res.json({
@@ -32,10 +32,10 @@ router.get('/claude-relay-config', authenticateAdmin, async (req, res) => {
 })
 
 /**
- * PUT /admin/claude-relay-config
+ * PUT /admin/all-relay-config
  * 更新 Claude 转发配置
  */
-router.put('/claude-relay-config', authenticateAdmin, async (req, res) => {
+router.put('/all-relay-config', authenticateAdmin, async (req, res) => {
   try {
     const {
       claudeCodeOnlyEnabled,
@@ -294,10 +294,10 @@ router.put('/claude-relay-config', authenticateAdmin, async (req, res) => {
 })
 
 /**
- * GET /admin/claude-relay-config/session-bindings
+ * GET /admin/all-relay-config/session-bindings
  * 获取会话绑定统计
  */
-router.get('/claude-relay-config/session-bindings', authenticateAdmin, async (req, res) => {
+router.get('/all-relay-config/session-bindings', authenticateAdmin, async (req, res) => {
   try {
     const stats = await claudeRelayConfigService.getSessionBindingStats()
     return res.json({

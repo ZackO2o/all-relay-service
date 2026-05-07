@@ -10,7 +10,7 @@ try {
 
 const Redis = require('ioredis')
 
-const CONFIG_KEY = 'claude_relay_config'
+const CONFIG_KEY = 'all_relay_config'
 const REQUEST_DETAIL_KEY_PATTERN = 'request_detail:*'
 const DEFAULT_RETENTION_HOURS = 6
 const MAX_RETENTION_HOURS = 720

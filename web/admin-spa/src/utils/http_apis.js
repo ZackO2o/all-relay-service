@@ -339,11 +339,11 @@ export const testWebhookApi = (data, config) =>
 export const testWebhookNotificationApi = (config) =>
   request({ url: '/admin/webhook/test-notification', method: 'POST', ...config })
 
-// Claude Relay 配置
+// Relay 配置
 export const getClaudeRelayConfigApi = (config) =>
-  request({ url: '/admin/claude-relay-config', method: 'GET', ...config })
+  request({ url: '/admin/all-relay-config', method: 'GET', ...config })
 export const updateClaudeRelayConfigApi = (data, config) =>
-  request({ url: '/admin/claude-relay-config', method: 'PUT', data, ...config })
+  request({ url: '/admin/all-relay-config', method: 'PUT', data, ...config })
 
 // 服务倍率配置（管理端）
 export const getAdminServiceRatesApi = (config) =>

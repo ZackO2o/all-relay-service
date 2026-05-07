@@ -5,7 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const process = require('process')
 
-const PID_FILE = path.join(__dirname, '..', 'claude-relay-service.pid')
+const PID_FILE = path.join(__dirname, '..', 'all-relay-service.pid')
 const LOG_FILE = path.join(__dirname, '..', 'logs', 'service.log')
 const ERROR_LOG_FILE = path.join(__dirname, '..', 'logs', 'service-error.log')
 const APP_FILE = path.join(__dirname, '..', 'src', 'app.js')
@@ -78,7 +78,7 @@ class ServiceManager {
       return false
     }
 
-    console.log('🚀 启动 Claude Relay Service...')
+    console.log('🚀 启动 ALL Relay Service...')
 
     if (daemon) {
       // 后台运行模式 - 使用nohup实现真正的后台运行
@@ -227,7 +227,7 @@ class ServiceManager {
 
   help() {
     console.log(`
-🔧 Claude Relay Service 进程管理器
+🔧 ALL Relay Service 进程管理器
 
 用法: npm run service <command> [options]
 

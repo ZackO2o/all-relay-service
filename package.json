@@ -1,5 +1,5 @@
 {
-  "name": "claude-relay-service",
+  "name": "all-relay-service",
   "version": "1.0.0",
   "description": "Claude Code API relay service with multi-account management, OpenAI compatibility, and API key authentication",
   "main": "src/app.js",
@@ -32,7 +32,7 @@
     "lint:check": "eslint src/**/*.js cli/**/*.js scripts/**/*.js",
     "format": "prettier --write \"src/**/*.js\" \"cli/**/*.js\" \"scripts/**/*.js\"",
     "format:check": "prettier --check \"src/**/*.js\" \"cli/**/*.js\" \"scripts/**/*.js\"",
-    "docker:build": "docker build -t claude-relay-service .",
+    "docker:build": "docker build -t all-relay-service .",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "migrate:apikey-expiry": "node scripts/migrate-apikey-expiry.js",
@@ -99,6 +99,6 @@
     "claude-code",
     "anthropic"
   ],
-  "author": "Claude Relay Service",
+  "author": "ALL Relay Service",
   "license": "MIT"
 }

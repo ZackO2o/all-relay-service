@@ -9,7 +9,7 @@ const upstreamErrorHelper = require('../../utils/upstreamErrorHelper')
 
 class CcrRelayService {
   constructor() {
-    this.defaultUserAgent = 'claude-relay-service/1.0.0'
+    this.defaultUserAgent = 'all-relay-service/1.0.0'
   }
 
   // 🚀 转发请求到CCR API

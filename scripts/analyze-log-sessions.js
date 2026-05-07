@@ -196,7 +196,7 @@ class LogSessionAnalyzer {
       const logFiles = files
         .filter(
           (file) =>
-            file.includes('claude-relay') &&
+            file.includes('all-relay') &&
             (file.endsWith('.log') ||
               file.endsWith('.log.1') ||
               file.endsWith('.log.gz') ||

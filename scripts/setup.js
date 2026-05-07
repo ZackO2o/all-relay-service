@@ -7,7 +7,7 @@ const ora = require('ora')
 const config = require('../config/config')
 
 async function setup() {
-  console.log(chalk.blue.bold('\n🚀 Claude Relay Service 初始化设置\n'))
+  console.log(chalk.blue.bold('\n🚀 ALL Relay Service 初始化设置\n'))
 
   const spinner = ora('正在进行初始化设置...').start()
 

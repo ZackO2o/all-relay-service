@@ -1008,18 +1008,18 @@ async function deleteBedrockAccount() {
 }
 
 // 程序信息
-program.name('claude-relay-cli').description('Claude Relay Service 命令行管理工具').version('1.0.0')
+program.name('all-relay-cli').description('ALL Relay Service 命令行管理工具').version('1.0.0')
 
 // 解析命令行参数
 program.parse()
 
 // 如果没有提供命令，显示帮助
 if (!process.argv.slice(2).length) {
-  console.log(styles.title('🚀 Claude Relay Service CLI\n'))
+  console.log(styles.title('🚀 ALL Relay Service CLI\n'))
   console.log('使用以下命令管理服务:\n')
-  console.log('  claude-relay-cli admin         - 创建初始管理员账户')
-  console.log('  claude-relay-cli keys          - API Key 管理（查看/修改过期时间/续期/删除）')
-  console.log('  claude-relay-cli bedrock       - Bedrock 账户管理（创建/查看/编辑/测试/删除）')
-  console.log('  claude-relay-cli status        - 查看系统状态')
+  console.log('  all-relay-cli admin         - 创建初始管理员账户')
+  console.log('  all-relay-cli keys          - API Key 管理（查看/修改过期时间/续期/删除）')
+  console.log('  all-relay-cli bedrock       - Bedrock 账户管理（创建/查看/编辑/测试/删除）')
+  console.log('  all-relay-cli status        - 查看系统状态')
   console.log('\n使用 --help 查看详细帮助信息')
 }

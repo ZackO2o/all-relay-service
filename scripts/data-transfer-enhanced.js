@@ -780,7 +780,7 @@ async function exportData() {
 // 显示帮助信息
 function showHelp() {
   console.log(`
-Enhanced Data Transfer Tool for Claude Relay Service
+Enhanced Data Transfer Tool for ALL Relay Service
 
 This tool handles encrypted data export/import between environments.
 
