@@ -73,13 +73,29 @@ install_nodejs() {
     elif [ "$PKG" = "pacman" ]; then
         pacman -S --noconfirm nodejs npm
     elif [ "$PKG" = "yum" ] || [ "$PKG" = "dnf" ]; then
-        # RHEL/CentOS/Fedora — 使用 NodeSource RPM 源
-        curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
-        $PKG_INSTALL nodejs
-    else
-        # Debian/Ubuntu
-        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-        $PKG_INSTALL nodejs
+        # RHEL/CentOS/Fedora — 使用 AppStream 模块
+        # CentOS Stream 9/10 提供原生 nodejs:18/20/22/24 模块
+        $PKG_INSTALL -y nodejs 2>/dev/null && {
+            local ver=$(node -v 2>/dev/null | sed 's/v//' | cut -d. -f1)
+            [ "$ver" -ge 18 ] 2>/dev/null && print_ok "Node.js $(node -v) 已安装" && return 0
+        }
+        # 如果系统 nodejs < 18，启用高版本模块
+        if dnf module list nodejs 2>/dev/null | grep -q 'nodejs.*20'; then
+            dnf module enable -y nodejs:20 2>/dev/null
+            $PKG_INSTALL -y nodejs
+        elif dnf module list nodejs 2>/dev/null | grep -q 'nodejs.*18'; then
+            dnf module enable -y nodejs:18 2>/dev/null
+            $PKG_INSTALL -y nodejs
+        else
+            # Fallback: 从 nodesource 直接安装
+            curl -fsSL https://rpm.nodesource.com/setup_20.x | bash - 2>/dev/null || {
+                # 最后的 fallback: 直接下载二进制
+                print_info "下载 Node.js 二进制包..."
+                curl -fsSL https://nodejs.org/dist/v20.19.1/node-v20.19.1-linux-x64.tar.xz -o /tmp/node.tar.xz
+                tar -xf /tmp/node.tar.xz -C /usr/local --strip-components=1
+            }
+            $PKG_INSTALL -y nodejs 2>/dev/null || true
+        fi
     fi
 
     if check_cmd node; then
