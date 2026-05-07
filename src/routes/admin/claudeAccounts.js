@@ -11,6 +11,7 @@ const claudeRelayService = require('../../services/relay/claudeRelayService')
 const accountGroupService = require('../../services/accountGroupService')
 const accountTestSchedulerService = require('../../services/accountTestSchedulerService')
 const apiKeyService = require('../../services/apiKeyService')
+const cliproxyOAuth = require('../../services/cliproxyOAuthService')
 const redis = require('../../models/redis')
 const { authenticateAdmin } = require('../../middleware/auth')
 const logger = require('../../utils/logger')
@@ -126,12 +127,26 @@ router.post('/claude-accounts/exchange-code', authenticateAdmin, async (req, res
     }
 
     // 交换访问令牌
-    const tokenData = await oauthHelper.exchangeCodeForTokens(
-      finalAuthCode,
-      oauthSession.codeVerifier,
-      oauthSession.state,
-      oauthSession.proxy // 传递代理配置
-    )
+    let tokenData
+    if (cliproxyOAuth.getBaseUrl()) {
+      // Use cliproxy-tls (Go uTLS proxy) for token exchange
+      logger.info('🔐 Using cliproxy-tls OAuth (uTLS) for code exchange')
+      tokenData = await cliproxyOAuth.exchangeCode(finalAuthCode, oauthSession.codeVerifier)
+      // Map cliproxy response to expected format
+      tokenData = {
+        access_token: tokenData.access_token,
+        refresh_token: tokenData.refresh_token,
+        expires_in: Math.round((new Date(tokenData.expire).getTime() - Date.now()) / 1000),
+        scope: 'user:profile user:inference user:sessions:claude_code user:mcp_servers user:file_upload'
+      }
+    } else {
+      tokenData = await oauthHelper.exchangeCodeForTokens(
+        finalAuthCode,
+        oauthSession.codeVerifier,
+        oauthSession.state,
+        oauthSession.proxy
+      )
+    }
 
     // 清理OAuth会话
     await redis.deleteOAuthSession(sessionId)
@@ -291,8 +306,16 @@ router.post('/claude-accounts/exchange-setup-token-code', authenticateAdmin, asy
 // Cookie自动授权端点 (基于sessionKey自动完成OAuth流程)
 // =============================================================================
 
-// 普通OAuth的Cookie自动授权
+// 普通OAuth的Cookie自动授权 [已弃用，使用标准PKCE OAuth + cliproxy-tls]
 router.post('/claude-accounts/oauth-with-cookie', authenticateAdmin, async (req, res) => {
+  // Check if cliproxy-tls is available (PKCE should be used instead)
+  if (cliproxyOAuth.getBaseUrl()) {
+    return res.status(400).json({
+      success: false,
+      error: 'Cookie OAuth已弃用',
+      message: 'CLAUDE_TLS_PROXY已配置，请使用标准PKCE OAuth流程（生成授权URL → 浏览器授权 → 回调）'
+    })
+  }
   try {
     const { sessionKey, proxy } = req.body
 
@@ -340,8 +363,16 @@ router.post('/claude-accounts/oauth-with-cookie', authenticateAdmin, async (req,
   }
 })
 
-// Setup Token的Cookie自动授权
+// Setup Token的Cookie自动授权 [已弃用，使用标准PKCE OAuth + cliproxy-tls]
 router.post('/claude-accounts/setup-token-with-cookie', authenticateAdmin, async (req, res) => {
+  // Check if cliproxy-tls is available (PKCE should be used instead)
+  if (cliproxyOAuth.getBaseUrl()) {
+    return res.status(400).json({
+      success: false,
+      error: 'Cookie OAuth已弃用',
+      message: 'CLAUDE_TLS_PROXY已配置，请使用标准PKCE OAuth流程（生成授权URL → 浏览器授权 → 回调）'
+    })
+  }
   try {
     const { sessionKey, proxy } = req.body
 

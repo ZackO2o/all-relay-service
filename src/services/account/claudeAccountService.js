@@ -23,7 +23,16 @@ const {
   normalizeOptionalNonNegativeInteger,
   normalizeTempUnavailablePolicyInput
 } = require('../../utils/tempUnavailablePolicy')
+const encryptionService = require('../../utils/encryptionService')
 
+// Lazy-loaded cliproxy-tls OAuth service (loaded only when CLAUDE_TLS_PROXY is set)
+let _cliproxyOAuth = null
+function _getCliproxyOAuth() {
+  if (!_cliproxyOAuth && process.env.CLAUDE_TLS_PROXY) {
+    _cliproxyOAuth = require('../cliproxyOAuthService')
+  }
+  return _cliproxyOAuth
+}
 /**
  * Check if account is Pro (not Max)
  * Compatible with both API real-time data (hasClaudePro) and local config (accountType)
@@ -327,15 +336,31 @@ class ClaudeAccountService {
         axiosConfig.proxy = false
       }
 
-      const response = await axios.post(
-        this.claudeApiUrl,
-        {
-          grant_type: 'refresh_token',
-          refresh_token: refreshToken,
-          client_id: this.claudeOauthClientId
-        },
-        axiosConfig
-      )
+      // 使用cliproxy-tls (Go uTLS代理)进行token刷新
+      let response
+      const proxyOAuth = _getCliproxyOAuth()
+      if (proxyOAuth) {
+        logger.info('🔄 Using cliproxy-tls for token refresh (uTLS)')
+        const tokenData = await proxyOAuth.refreshTokens(refreshToken)
+        response = {
+          status: 200,
+          data: {
+            access_token: tokenData.access_token,
+            refresh_token: tokenData.refresh_token,
+            expires_in: Math.round((new Date(tokenData.expire).getTime() - Date.now()) / 1000)
+          }
+        }
+      } else {
+        response = await axios.post(
+          this.claudeApiUrl,
+          {
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken,
+            client_id: this.claudeOauthClientId
+          },
+          axiosConfig
+        )
+      }
 
       if (response.status === 200) {
         // 记录完整的响应数据到专门的认证详细日志

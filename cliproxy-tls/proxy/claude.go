@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ZackO2o/all-relay-service/cliproxy-tls/profile"
+	"github.com/ZackO2o/all-relay-service/cliproxy-tls/signing"
 	"github.com/ZackO2o/all-relay-service/cliproxy-tls/utls"
 )
 
@@ -56,6 +57,10 @@ func (p *ClaudeProxy) HandleMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
+
+	// Apply CCH signing if billing header contains cch placeholder
+	// This prevents Anthropic from fingerprinting the request as non-Claude-CLI
+	body = signing.SignBody(body)
 
 	// Build upstream request
 	upstreamURL := ClaudeBaseURL + "/v1/messages"
