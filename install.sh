@@ -72,7 +72,12 @@ install_nodejs() {
         brew install node@18
     elif [ "$PKG" = "pacman" ]; then
         pacman -S --noconfirm nodejs npm
+    elif [ "$PKG" = "yum" ] || [ "$PKG" = "dnf" ]; then
+        # RHEL/CentOS/Fedora — 使用 NodeSource RPM 源
+        curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
+        $PKG_INSTALL nodejs
     else
+        # Debian/Ubuntu
         curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
         $PKG_INSTALL nodejs
     fi
@@ -101,9 +106,15 @@ install_redis() {
     elif [ "$PKG" = "pacman" ]; then
         pacman -S --noconfirm redis
         systemctl start redis 2>/dev/null || redis-server --daemonize yes
+    elif [ "$PKG" = "yum" ] || [ "$PKG" = "dnf" ]; then
+        # RHEL/CentOS — Redis 在 EPEL 源中
+        $PKG_INSTALL epel-release
+        $PKG_INSTALL redis
+        systemctl start redis 2>/dev/null || redis-server --daemonize yes
     else
-        $PKG_INSTALL redis-server redis
-        systemctl start redis 2>/dev/null || service redis-server start 2>/dev/null || redis-server --daemonize yes
+        # Debian/Ubuntu
+        $PKG_INSTALL redis-server
+        systemctl start redis-server 2>/dev/null || service redis-server start 2>/dev/null || redis-server --daemonize yes
     fi
 
     if check_cmd redis-cli; then
@@ -133,7 +144,7 @@ install_service() {
 
     if [ ! -d "$install_dir" ]; then
         print_info "下载 ALL Relay Service..."
-        git clone https://github.com/ZackO2o/all-relay-service.git --branch v0.1.0 --depth 1 "$install_dir"
+        git clone https://github.com/ZackO2o/all-relay-service.git --branch v0.2.0 --depth 1 "$install_dir"
         print_ok "下载完成"
     fi
 
@@ -173,7 +184,7 @@ EOF
     cat > /etc/systemd/system/all-relay.service << 'EOF' 2>/dev/null || true
 [Unit]
 Description=ALL Relay Service
-After=network.target redis-server.service
+After=network.target redis.service
 
 [Service]
 Type=simple
